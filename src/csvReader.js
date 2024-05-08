@@ -1,31 +1,26 @@
-const fs = require("fs");
-const { parse } = require("json2csv");
-const csv = require("csv-parser");
+const fs = require('fs');
+const csv = require('csv-parser');
+const { parse } = require('json2csv');
 
-async function readCSV(filePath) {
-  return new Promise((resolve, reject) => {
-    const data = [];
-    fs.createReadStream(filePath)
-      .pipe(csv())
-      .on("data", (row) => {
-        data.push(row);
-      })
-      .on("end", () => {
-        resolve(data);
-      })
-      .on("error", (error) => {
-        reject(error);
-      });
-  });
+function readCSV(filePath) {
+    const results = [];
+
+    return new Promise((resolve, reject) => {
+        fs.createReadStream(filePath)
+            .pipe(csv())
+            .on('data', (data) => results.push(data))
+            .on('end', () => {
+                resolve(results);
+            })
+            .on('error', (error) => {
+                reject(error);
+            });
+    });
 }
 
 async function writeCSV(filename, data) {
-  try {
-    const csvData = parse(data);
-    fs.writeFileSync(filename, csvData);
-  } catch (error) {
-    throw error;
-  }
+    const csv = parse(data);
+    fs.writeFileSync(filename, csv);
 }
 
-module.exports = { readCSV, writeCSV };
+module.exports = {readCSV,writeCSV};
